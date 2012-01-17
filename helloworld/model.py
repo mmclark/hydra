@@ -22,5 +22,4 @@ def db_query(query, *args, **kwargs):
 
 
 def get_session(session_md5):
-    log.warning(session_md5)
-    db_get('SELECT * FROM session WHERE session_md5=%s', session_md5)
+  sess = db_get('SELECT * FROM session WHERE session_md5=%s', session_md5)
