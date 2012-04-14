@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Hydra SQL Diff Program - maintain diff/patch state in database
+# Hydra Schema Management Program
 #
 # Copyright 2012 Michael D'Agosta <mdagosta@codebug.com>
 #

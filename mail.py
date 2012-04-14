@@ -5,10 +5,25 @@
 # This program is copyrighted Free Software, and may be used under the
 # terms of the Python License.
 
-import log, os.path
+
+# Python Imports
+import logging as log
+import os.path
+import email.mime.text
+import email.mime.multipart
+import email.Utils
+import email.Header
+import smtplib
+import traceback
+
+# Extern Imports
 import tornado.template
-import email.mime.text, email.mime.multipart, email.Utils, email.Header, smtplib, traceback
-import stdlib, topology
+from tornado.options import options
+
+# Project Imports
+import stdlib
+import config
+
 
 # A lot is adapted from http://mg.pov.lt/blog/unicode-emails-in-python
 
@@ -87,8 +102,8 @@ def sendmail(from_addr, to_addrs, msg):
     traceback.print_exc()
 
 def error_email(domain, handler):
-  service_email = topology.getenv('from_email')
-  email = topology.getenv('to_email')
+  service_email = options.from_email
+  email = options.to_email
   subject = "Hydra Error on %s" % domain
   tb = traceback.format_exc()
   tmpl = {'email': email, 'domain': domain, 'handler': handler, 'traceback': tb}
