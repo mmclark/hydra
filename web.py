@@ -43,7 +43,7 @@ import model
 
 # Application
 class Application(tornado.web.Application):
-    def __init__(self):
+    def __init__(self, **kwargs):
         settings = dict(
           cookie_secret=options.cookie_secret,
           xsrf_cookies=True,
@@ -51,15 +51,12 @@ class Application(tornado.web.Application):
           login_url='/',
           ui_methods=[uimethods],
         )
+        settings.update(kwargs)
         if 'template_path' in options:
             settings['template_path'] = options.template_path
         if 'static_path' in options:
             settings['static_path'] = options.static_path
-        
         tornado.web.Application.__init__(self, **settings)
-
-  #def setup_handlers(self):
-    #self.add_handlers(r".*helloworld\.com", helloworld.handlers.handler_urls)
 
     @staticmethod
     def start(application):
@@ -68,7 +65,7 @@ class Application(tornado.web.Application):
         log.info('listening on %s:%s' % (options.host, options.port))
         http_server.listen(options.port, address=options.host)
         tornado.ioloop.IOLoop.instance().start()
-        
+
 
 # Session Handler
 class Session(dict):
@@ -138,21 +135,21 @@ class RequestHandler(tornado.web.RequestHandler):
         if type(ck) is dict:
             ck = dict([(str(key), ck[key]) for key in ck])
         return ck
-  
+
     def html_escape(self, val):
         return xml.sax.saxutils.escape(val, {'"': '&quot;'})
-  
+
     def respond_json(self, json_str):
         self.write(tornado.escape.json_encode(json_str))
         self.set_header('Content-Type', 'application/json')
         self.finish()
-  
+
     def _handle_request_exception(self, e):
         if env not in (options.local_envs) and not isinstance(e, tornado.web.HTTPError):
             # if we're not developing locally, send an email
             mail.error_email(self._domain, self)
         super(RequestHandler, self)._handle_request_exception(e)
-  
+
     def session_start(self):
         session_ck = self.get_secure_cookie('session')
         if session_ck:
@@ -164,18 +161,18 @@ class RequestHandler(tornado.web.RequestHandler):
             model.Session.put(self.session['id'], self.session)
         self.set_secure_cookie('session', self.session['id'], expires_days=self.session_expiry)
         self.tmpl['session'] = self.session
-  
+
     def session_end(self):
         self.clear_cookie('session')
         self.clear_cookie('auth')
         model.Session.delete(self.session['id'])
-  
+
     def set_options_cookie(self, opts):
         self.set_secure_cookie('options', self.cookie_encode(opts), expires_days=365)
-  
+
     def get_options_cookie(self):
         return self.cookie_decode(self.get_secure_cookie('options'))
-  
+
     def prepare(self):
         self.set_header('Cache-Control', 'no-cache')
         self.set_header('Pragma', 'no-cache')
@@ -187,12 +184,12 @@ class RequestHandler(tornado.web.RequestHandler):
             self.request.args[key] = value[0]
         if self.use_session:
             self.session_start()
-  
+
     def finish(self, chunk=None):
         if self.use_session and self.session.dirty():
             model.put_session(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
-  
+
     def directory_scan(self):
         dirnames = [self._domain]
         dirname = self._domain
@@ -203,7 +200,7 @@ class RequestHandler(tornado.web.RequestHandler):
             dirname = dirname[:-4]
             dirnames.append(dirname)
         return dirnames
-  
+
     def render_scan(self, filename):
         for dirname in self.directory_scan():
             try:
