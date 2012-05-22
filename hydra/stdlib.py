@@ -15,7 +15,7 @@ import time
 import traceback
 import xml.sax.saxutils
 
-# Extern Imports
+ # Extern Imports
 import bcrypt
 
 
@@ -50,13 +50,13 @@ def html_entity_decode(val):
     return re.sub("&#(\d+)(;|(?=\s))", _html_entity_callback, val)
 
 def get_request_handler():    #  This function is very slow
-  f = inspect.currentframe()
-  while (f):
-    info = inspect.getframeinfo(f)
-    if inspect.getmodulename(info[0]) == 'web' and info[2] == '_execute':
-      reqh = f.f_locals['self']
-      return reqh
-    f = f.f_back
+    f = inspect.currentframe()
+    while (f):
+        info = inspect.getframeinfo(f)
+        if inspect.getmodulename(info[0]) == 'web' and info[2] == '_execute':
+            reqh = f.f_locals['self']
+            return reqh
+        f = f.f_back
 
 def absdir(path):
     return os.path.abspath(os.path.dirname(path))
