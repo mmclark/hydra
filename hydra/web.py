@@ -47,7 +47,7 @@ class Application(tornado.web.Application):
         settings = dict(
           cookie_secret=options.cookie_secret,
           xsrf_cookies=True,
-          debug=True,
+          debug=options.debug,
           login_url='/',
           ui_methods=[uimethods],
         )
@@ -237,7 +237,6 @@ class Logout(RequestHandler):
         self.auth_end()
         self.session_end()
         self.redirect('/')
-
 
 
 # Main
