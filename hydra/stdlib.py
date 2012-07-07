@@ -39,16 +39,6 @@ def _unicode(obj, encoding='utf-8'):
 def html_unescape(val):
     return xml.sax.saxutils.unescape(val, {'&quot;': '"'})
 
-def _html_entity_callback(matches):
-    entity_id = matches.group(1)
-    try:
-        return unichr(int(entity_id))
-    except:
-        return entity_id
-
-def html_entity_decode(val):
-    return re.sub("&#(\d+)(;|(?=\s))", _html_entity_callback, val)
-
 def get_request_handler():    #  This function is very slow
     f = inspect.currentframe()
     while (f):

@@ -9,7 +9,6 @@
 
 
 # Environment
-#if __name__ == '__main__':
 import logging as log, tornado.options   # Configure logging first so works in imports
 from tornado.options import define, options
 if options.logging != 'none':
@@ -28,10 +27,11 @@ import xml.sax.saxutils
 # Extern Imports
 import tornado.httpserver
 import tornado.ioloop
-import tornado.options
-from tornado.options import options
+import tornado.options; from tornado.options import options
 import tornado.escape
 import tornado.web
+import django.conf; django.conf.settings.configure()    # Disable django settings
+import django.forms.fields
 
 # Project Imports
 import uimethods
@@ -111,8 +111,6 @@ class RequestHandler(tornado.web.RequestHandler):
         super(RequestHandler, self).__init__(*args, **kwargs)
         self._domain = self.request.headers['Host'].split(':')[0]
         self._app_name = schema = self._domain.split('.')[1]
-        #if not topology.getenv(schema+'_mysql_host'):
-        #    schema = 'hydra'
         self._schema = schema
         self.tmpl = {}
         self.tmpl['domain'] = self._domain
@@ -124,6 +122,9 @@ class RequestHandler(tornado.web.RequestHandler):
         self.session_expiry = 1
         self.auth_method = 'username_password'
         self.auth_expiry = 30
+
+    def logw(self, var, msg=''):
+        log.warning('%s %s %s', msg, type(var), pprint.pformat(var))
 
     def cookie_encode(self, val):
         return tornado.escape.url_escape(tornado.escape.json_encode(val))
@@ -173,6 +174,17 @@ class RequestHandler(tornado.web.RequestHandler):
     def get_options_cookie(self):
         return self.cookie_decode(self.get_secure_cookie('options'))
 
+    def validate_form(self):
+        for name, field in self.form_fields.items():
+            field.value = self.get_argument(name, None)
+            try:
+                field.clean(field.value)
+                field.valid = True
+            except django.forms.fields.ValidationError:
+                field.valid = False
+        self.form_valid = False not in [v.valid for f,v in self.form_fields.items()]
+        return self.form_valid
+
     def prepare(self):
         self.set_header('Cache-Control', 'no-cache')
         self.set_header('Pragma', 'no-cache')
@@ -190,54 +202,6 @@ class RequestHandler(tornado.web.RequestHandler):
             model.put_session(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
 
-    def directory_scan(self):
-        dirnames = [self._domain]
-        dirname = self._domain
-        if dirname.startswith('local.'):
-            dirname = self._domain[6:]
-            dirnames.append(dirname)
-        if dirname.endswith('.com') or dirname.endswith('.net') or dirname.endswith('.org'):
-            dirname = dirname[:-4]
-            dirnames.append(dirname)
-        return dirnames
-
-    def render_scan(self, filename):
-        for dirname in self.directory_scan():
-            try:
-                self.render(dirname+'/'+filename, **self.tmpl)
-                return True
-            except IOError, ex:
-                log.error(traceback.print_exc())
-            except:
-                log.error(traceback.print_exc())
-
-class Index(RequestHandler):
-    def get(self):
-        # see if there's a specific site override
-        if self.render_scan('index.html'):
-            return
-        # try to serve up the standard hydra page, overwise print domain name
-        try:
-            return self.render('index.html', **self.tmpl)
-        except IOError, ex:
-            if 'No such file or directory' in ex:
-                self.write(self._domain)
-
-    def head(self):
-        pass
-
-
-class Logout(RequestHandler):
-    def get(self):
-        self.auth_end()
-        self.session_end()
-        self.redirect('/')
-
-    def post(self):
-        self.auth_end()
-        self.session_end()
-        self.redirect('/')
-
 
 # Main
 def main():
@@ -245,8 +209,6 @@ def main():
     tornado.options.parse_command_line()
     app = Application()
     app.setup_handlers()
-    #tornado.locale.load_translations(
-    #  os.path.join(os.path.dirname(__file__), "translations"))
 
 if __name__ == "__main__":
     main()
