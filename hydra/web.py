@@ -181,8 +181,9 @@ class RequestHandler(tornado.web.RequestHandler):
             try:
                 field.clean(field['value'])
                 field['valid'] = True
-            except django.forms.fields.ValidationError:
+            except django.forms.fields.ValidationError, ex:
                 field['valid'] = False
+                field['error_msg'] = ex.messages[0]
         self.form_valid = False not in [v['valid'] for f, v in self.form_fields.items()]
         return self.form_valid
 
@@ -203,10 +204,11 @@ class RequestHandler(tornado.web.RequestHandler):
             model.put_session(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
 
+
 class EmailField(django.forms.fields.EmailField, dict):
     pass
 
-class CharField(django.forms.fields.EmailField, dict):
+class CharField(django.forms.fields.CharField, dict):
     pass
 
 
