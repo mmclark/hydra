@@ -175,14 +175,15 @@ class RequestHandler(tornado.web.RequestHandler):
         return self.cookie_decode(self.get_secure_cookie('options'))
 
     def validate_form(self):
+        self.tmpl['validated'] = True
         for name, field in self.form_fields.items():
-            field.value = self.get_argument(name, None)
+            field['value'] = self.get_argument(name, None)
             try:
-                field.clean(field.value)
-                field.valid = True
+                field.clean(field['value'])
+                field['valid'] = True
             except django.forms.fields.ValidationError:
-                field.valid = False
-        self.form_valid = False not in [v.valid for f,v in self.form_fields.items()]
+                field['valid'] = False
+        self.form_valid = False not in [v['valid'] for f, v in self.form_fields.items()]
         return self.form_valid
 
     def prepare(self):
@@ -201,6 +202,12 @@ class RequestHandler(tornado.web.RequestHandler):
         if self.use_session and self.session.dirty():
             model.put_session(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
+
+class EmailField(django.forms.fields.EmailField, dict):
+    pass
+
+class CharField(django.forms.fields.EmailField, dict):
+    pass
 
 
 # Main
