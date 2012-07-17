@@ -65,7 +65,7 @@ if options.create:
         sql = "GRANT ALL PRIVILEGES ON %s.* TO '%s'@'%s' IDENTIFIED BY '%s'"
         sql = sql % (schema, user, host, schema_password)
         db.execute(sql)
-        log.info('Database was created successfully. Now re-run schema.py without -c')
+        log.info('Database was created successfully. Now re-run schema.py without --create')
     except:
         log.error('DB creation failed. Did you set up config?')
         log.error(traceback.format_exc())

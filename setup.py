@@ -8,6 +8,11 @@ setup(
     description = 'Hydra Tornado utilities',
     url = 'https://github.com/mdagosta/hydra',
     packages = ['hydra'],
+    entry_points = {
+        "console_scripts": [
+            "schema = hydra.schema:main"
+            ]
+        },
     install_requires = [
         'distribute',
         'tornado == 2.3',
