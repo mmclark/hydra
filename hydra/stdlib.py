@@ -24,8 +24,11 @@ def md5hex(val):
 
 BCRYPT_LOG_ROUNDS = 10
 
-def bcrypt_salt():
-    return bcrypt.gensalt(log_rounds=8)
+def bcrypt_salt(log_rounds=8):
+    return bcrypt.gensalt(log_rounds=log_rounds)
+
+def bcrypt_hashpw(password, log_rounds):
+    return bcrypt.hashpw(password, log_rounds)
 
 def bcrypt_password(password):
     return bcrypt.hashpw(password, bcrypt.gensalt(log_rounds=BCRYPT_LOG_ROUNDS))

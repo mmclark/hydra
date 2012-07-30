@@ -201,7 +201,7 @@ class RequestHandler(tornado.web.RequestHandler):
 
     def finish(self, chunk=None):
         if self.use_session and self.session.dirty():
-            model.put_session(self.session['id'], self.session)
+            model.Session.put(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
 
 
