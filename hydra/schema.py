@@ -108,7 +108,7 @@ def patch_diffs(sql_dir, prefix='diff'):
     diffs = sorted(diffs, cmp=diff_sort_cmp)
     return diffs
 
-# Main
+
 def main():
     # check if sql_diff table exists
     sql = "SHOW TABLE STATUS LIKE 'sql_diff'"
@@ -124,8 +124,7 @@ def main():
         """
         db.execute(sql_diff)
 
-
-    # determine all potential patch filenames
+    # determine potential patch filenames
     sql_dirs = {}
     sql_dirs['hydra'] = stdlib.absdir(__file__) + '/sql'
     sql_dirs[options.app] = options.basedir + '/sql'
@@ -134,7 +133,7 @@ def main():
     if not os.path.realpath(sql_dirs[options.app]) == os.path.realpath(sql_dirs['hydra']):
         diffs[options.app] = patch_diffs(sql_dirs[options.app])
 
-    # insert unknown patches into the sql_diff table, filtering out patches already inserted
+    # Filter out applied patches, insert unknown patches into sql_diff table
     db_patch_names = {}
     for diff in sql_diff_scan():
         db_patch_names.setdefault(diff['diff_type'], []).append(diff['diff_name'])
