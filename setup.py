@@ -2,7 +2,7 @@
 from setuptools import setup
 setup(
     name = 'hydra',
-    version = '0.12',
+    version = '0.13',
     author = "Michael D'Agosta",
     author_email = 'mdagosta@codebug.com',
     description = 'Hydra Tornado utilities',
