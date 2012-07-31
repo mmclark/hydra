@@ -120,8 +120,6 @@ class RequestHandler(tornado.web.RequestHandler):
         self.tmpl['scheme'] = 'http://'
         self.use_session = True
         self.session_expiry = 1
-        self.auth_method = 'username_password'
-        self.auth_expiry = 30
 
     def logw(self, var, msg=''):
         log.warning('%s %s %s', msg, type(var), pprint.pformat(var))
