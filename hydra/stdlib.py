@@ -22,7 +22,7 @@ import bcrypt
 def md5hex(val):
     return hashlib.md5(val).hexdigest()
 
-BCRYPT_LOG_ROUNDS = 10
+BCRYPT_LOG_ROUNDS = 12
 
 def bcrypt_salt(log_rounds=8):
     return bcrypt.gensalt(log_rounds=log_rounds)
