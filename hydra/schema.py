@@ -34,7 +34,7 @@ import stdlib
 # Command line options - abort early if options not set properly
 define('app', default=None, help='[Required] Application name', type=str)
 define('create', default=None, help='Create schema', type=bool)
-define('env', default=None, help='Environment [local, quartz] - or set HYDAR_ENV', type=str)
+define('env', default=None, help='Environment [local, quartz] - or set HYDRA_ENV', type=str)
 tornado.options.parse_command_line()
 env = os.getenv('HYDRA_ENV')
 if not env:
