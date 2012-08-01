@@ -26,6 +26,7 @@ import traceback
 # Extern Imports
 import tornado.database
 import MySQLdb
+import hydra.config
 
 # Project Imports
 import stdlib
@@ -36,9 +37,7 @@ define('app', default=None, help='[Required] Application name', type=str)
 define('create', default=None, help='Create schema', type=bool)
 define('env', default=None, help='Environment [local, quartz] - or set HYDRA_ENV', type=str)
 tornado.options.parse_command_line()
-env = os.getenv('HYDRA_ENV')
-if not env:
-    env = options.env
+env = hydra.config.get_env()
 if not options.app or not env:
     tornado.options.print_help()
     sys.exit(1)

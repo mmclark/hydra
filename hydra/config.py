@@ -9,15 +9,20 @@
 # Python Imports
 import logging as log
 import os
-env = os.getenv('HYDRA_ENV')
 
 # Extern Imports
 import tornado.options
+from tornado.options import options
 
+def get_env():
+    if options.get('env'):
+        return options.env
+    else:
+        return os.getenv('HYDRA_ENV')
 
 # Allow projects to override tornado options
 def set_env(environments):
-    env_options = environments.get(env, {})
+    env_options = environments.get(get_env(), {})
     for setting, value in env_options.items():
-        if tornado.options.options.get(setting):
-            tornado.options.options[setting].set(value)
+        if options.get(setting):
+            options[setting].set(value)
