@@ -81,8 +81,7 @@ def encode_email(sender, recipient, subject, body, reply_to, service_sender):
 
 def render_email(handler, from_email, to_addrs, subject, template, email_opts, **kwargs):
     if not handler:
-        template_path = os.path.join(os.path.dirname(__file__), "templates")
-        template_loader = tornado.template.Loader(template_path)
+        template_loader = tornado.template.Loader(options.template_path)
         plain = stdlib._unicode(template_loader.load(template+'.txt').generate(**email_opts))
         html = stdlib._unicode(template_loader.load(template+'.html').generate(**email_opts))
     else:
@@ -95,7 +94,9 @@ def render_email(handler, from_email, to_addrs, subject, template, email_opts, *
 
 def sendmail(from_addr, to_addrs, msg):
     try:
-        conn = smtplib.SMTP('localhost')
+        conn = smtplib.SMTP(options.smtp_host, options.smtp_port)
+        if options.smtp_user:
+            conn.login(options.smtp_user, options.smtp_pass)
         conn.sendmail(from_addr, to_addrs, msg)
         return conn.quit()
     except:
