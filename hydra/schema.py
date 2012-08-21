@@ -147,6 +147,7 @@ def main():
         filename = os.path.join(sql_dirs[patch['diff_type']], patch['diff_name'])
         sql = open(filename).read()
         try:
+            log.warning(sql)
             db.execute(sql)
         except MySQLdb.ProgrammingError, ex:
             if ex.args[0] == 2014 and ex.args[1].startswith('Commands out of sync'):
@@ -155,6 +156,7 @@ def main():
                 log.error("Reconnecting...")
                 log.error("Ignore OperationalError (2013, Lost connection to MySQL)")
                 db.reconnect()
+            raise
         log.warning("Applying patch:  %s / %s" % (patch['diff_type'], patch['diff_name']))
         sql_diff_apply(patch['diff_type'], patch['diff_name'])
 
