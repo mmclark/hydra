@@ -108,6 +108,7 @@ def patch_diffs(sql_dir, prefix='diff'):
     return diffs
 
 
+# Main
 def main():
     # check if sql_diff table exists
     sql = "SHOW TABLE STATUS LIKE 'sql_diff'"
@@ -172,3 +173,4 @@ if __name__ in ('__main__', 'hydra.schema'):
     except tornado.database.OperationalError, e:
         log.error("The database doesn't exist. Try -c option.")
     main()
+    exit(0)    # Call exit to prevent setup.py from calling main() by default
