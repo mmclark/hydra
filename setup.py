@@ -15,6 +15,6 @@ setup(
         },
     install_requires = [
         'distribute',
-        'tornado == 2.3',
+        'tornado == 2.4',
     ],
     )
