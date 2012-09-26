@@ -2,7 +2,7 @@
 from setuptools import setup
 setup(
     name = 'hydra',
-    version = '0.17',
+    version = '0.18',
     author = "Michael D'Agosta",
     author_email = 'mdagosta@codebug.com',
     description = 'Hydra Tornado utilities',
@@ -17,5 +17,6 @@ setup(
         'distribute',
         'tornado == 2.4',
         'py-bcrypt',
+        'MySQL-python',
     ],
     )
