@@ -113,7 +113,7 @@ class RequestHandler(tornado.web.RequestHandler):
         self._app_name = schema = self._domain.split('.')[1]
         self._schema = schema
         self.tmpl = {}
-        self.tmpl['domain'] = self._domain
+        self.tmpl['domain'] = options.domain
         self.tmpl['schema'] = self._schema
         self.tmpl['app_name'] = self._app_name
         self.tmpl['user_agent'] = self.request.headers.get('User-Agent')
