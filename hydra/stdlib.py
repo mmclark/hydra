@@ -6,6 +6,7 @@
 # terms of the Python License.
 
 # Python Imports
+import commands
 import hashlib
 import inspect
 import os
@@ -71,13 +72,13 @@ def ansi_esc(colorName, **kwargs):
     out += str(colors[colorName]) + 'm'
     return out
 
-def cline(line):
-    pick_ansi = {'-': 'red', '+': 'green', '*': 'green'}
+def cline(line, mode):
+    pick_ansi = {'-': 'red', '+': 'green', '*': 'green', '@': 'cyan'}
     color = pick_ansi.get(line[0], '')
     if color != '':
-        print ansi_esc(color) + line + ansi_esc('reset')
-    else:
-        print line
+        line = ansi_esc(color) + line + ansi_esc('reset')
+    if mode == 'print': print line
+    if mode == 'return': return line
 
 def cdiff(line):
     pick_ansi = {'-': 'red', '+': 'green', '*': 'green'}
@@ -86,6 +87,17 @@ def cdiff(line):
         return ansi_esc(color) + line + ansi_esc('reset')
     else:
         return line
+
+def cdiff_files(lhs, rhs, mode='print'):
+  out = commands.getoutput("diff -ub %s %s" % (lhs.strip(), rhs.strip()))
+  output = []
+  for line in out.split('\n'):
+    if not line:
+      continue
+    if mode == 'print': cline(line, mode)
+    if mode == 'return': output.append(cline(line, mode))
+  return '\n'.join(output)
+
 
 def cstr(data, color):
     return ansi_esc(color) + data + ansi_esc('reset')
