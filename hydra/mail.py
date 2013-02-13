@@ -93,6 +93,8 @@ def render_email(handler, from_email, to_addrs, subject, template, email_opts, *
     return encode_email(from_email, to_addrs, subject, body, reply_to, service_sender)
 
 def sendmail(from_addr, to_addrs, msg):
+    if not options.smtp_host or not options.smtp_port:
+        return log.warning('No SMTP hort or port supplied, not sending error email')
     try:
         conn = smtplib.SMTP(options.smtp_host, options.smtp_port)
         if options.smtp_user:

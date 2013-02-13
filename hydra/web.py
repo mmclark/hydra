@@ -109,17 +109,11 @@ class Session(dict):
 class RequestHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
         super(RequestHandler, self).__init__(*args, **kwargs)
-        self._domain = self.request.headers['Host'].split(':')[0]
-        self._app_name = schema = self._domain.split('.')[1]
-        self._schema = schema
         self.tmpl = {}
         self.tmpl['domain'] = options.domain
-        self.tmpl['schema'] = self._schema
-        self.tmpl['app_name'] = self._app_name
+        self.tmpl['app_name'] = options.app_name
         self.tmpl['user_agent'] = self.request.headers.get('User-Agent')
-        self.tmpl['scheme'] = 'http://'
-        self.use_session = True
-        self.session_expiry = 1
+        self.tmpl['scheme'] = 'https://'
 
     def logw(self, var, msg=''):
         log.warning('%s %s %s', msg, type(var), pprint.pformat(var))
@@ -146,7 +140,7 @@ class RequestHandler(tornado.web.RequestHandler):
     def _handle_request_exception(self, e):
         if env not in (options.local_envs) and not isinstance(e, tornado.web.HTTPError):
             # if we're not developing locally, send an email
-            mail.error_email(self._domain, self)
+            mail.error_email(options.domain, self)
         super(RequestHandler, self)._handle_request_exception(e)
 
     def session_start(self):
@@ -158,7 +152,7 @@ class RequestHandler(tornado.web.RequestHandler):
         if not hasattr(self, 'session'):
             self.session = Session(salt=self.request.headers)
             model.Session.put(self.session['id'], self.session)
-        self.set_secure_cookie('session', self.session['id'], expires_days=self.session_expiry)
+        self.set_secure_cookie('session', self.session['id'], expires_days=options.session_expiry)
         self.tmpl['session'] = self.session
 
     def session_end(self):
@@ -194,13 +188,16 @@ class RequestHandler(tornado.web.RequestHandler):
         self.request.args = {}
         for key, value in self.request.arguments.iteritems():
             self.request.args[key] = value[0]
-        if self.use_session:
+        if options.use_sessions:
             self.session_start()
 
     def finish(self, chunk=None):
-        if self.use_session and self.session.dirty():
+        if options.use_sessions and self.session.dirty():
             model.Session.put(self.session['id'], self.session)
         tornado.web.RequestHandler.finish(self, chunk)
+
+    def head(self):
+        pass
 
 
 class EmailField(django.forms.fields.EmailField, dict):
