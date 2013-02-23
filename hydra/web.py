@@ -166,9 +166,10 @@ class RequestHandler(tornado.web.RequestHandler):
     def get_options_cookie(self):
         return self.cookie_decode(self.get_secure_cookie('options'))
 
-    def validate_form(self):
+    def validate_form(self, form_fields=None):
         self.tmpl['validated'] = True
-        for name, field in self.form_fields.items():
+        form_fields = form_fields or self.form_fields
+        for name, field in form_fields.items():
             field['value'] = self.get_argument(name, None)
             try:
                 field.clean(field['value'])
@@ -176,7 +177,7 @@ class RequestHandler(tornado.web.RequestHandler):
             except django.forms.fields.ValidationError, ex:
                 field['valid'] = False
                 field['error_msg'] = ex.messages[0]
-        self.form_valid = False not in [v['valid'] for f, v in self.form_fields.items()]
+        self.form_valid = False not in [v['valid'] for f, v in form_fields.items()]
         return self.form_valid
 
     def prepare(self):
