@@ -17,6 +17,7 @@ from tornado.options import define, options
 define("smtp_host", default=None, help="SMTP host to connect", type=str)
 define("smtp_port", default=None, help="SMTP port to connect", type=str)
 define("smtp_user", default=None, help="SMTP user to connect", type=str)
+define("smtp_pass", default=None, help="SMTP pass to connect", type=str)
 define("use_sessions", default=True, help="Use sessions", type=bool)
 define("use_auth", default=True, help="Use member authentication", type=bool)
 define("session_expiry", default=90, help="Session expiration in days", type=int)

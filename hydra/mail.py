@@ -96,10 +96,13 @@ def sendmail(from_addr, to_addrs, msg):
     if not options.smtp_host or not options.smtp_port:
         return log.warning('No SMTP hort or port supplied, not sending error email')
     try:
-        conn = smtplib.SMTP(options.smtp_host, options.smtp_port)
         if options.smtp_user:
+            conn = smtplib.SMTP_SSL(options.smtp_host, options.smtp_port)
             conn.login(options.smtp_user, options.smtp_pass)
+        else:
+            conn = smtplib.SMTP(options.smtp_host, options.smtp_port)
         conn.sendmail(from_addr, to_addrs, msg)
+        log.warning('Sent email to: %s' % to_addrs)
         return conn.quit()
     except:
         traceback.print_exc()
