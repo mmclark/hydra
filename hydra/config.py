@@ -25,7 +25,7 @@ define("auth_expiry", default=90, help="Authentication expiration in days", type
 
 
 def get_env():
-    if options.get('env'):
+    if options.get('env') and options.env:
         return options.env
     else:
         return os.getenv('HYDRA_ENV')
