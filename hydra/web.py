@@ -168,11 +168,11 @@ class RequestHandler(tornado.web.RequestHandler):
 
     def validate_form(self, form_fields=None):
         self.tmpl['validated'] = True
-        form_fields = form_fields or self.form_fields
+        form_fields = form_fields or getattr(self, form_fields)
         for name, field in form_fields.items():
             field['value'] = self.get_argument(name, None)
             try:
-                field.clean(field['value'])
+                field['cleaned'] = field.clean(field['value'])
                 field['valid'] = True
             except django.forms.fields.ValidationError, ex:
                 field['valid'] = False
@@ -204,7 +204,16 @@ class RequestHandler(tornado.web.RequestHandler):
 class EmailField(django.forms.fields.EmailField, dict):
     pass
 
+class DateField(django.forms.fields.DateField, dict):
+    pass
+
 class CharField(django.forms.fields.CharField, dict):
+    pass
+
+class IntegerField(django.forms.fields.IntegerField, dict):
+    pass
+
+class DecimalField(django.forms.fields.DecimalField, dict):
     pass
 
 
