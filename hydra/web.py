@@ -30,6 +30,7 @@ import tornado.ioloop
 import tornado.options; from tornado.options import options
 import tornado.escape
 import tornado.web
+import tornado.wsgi
 import django.conf; django.conf.settings.configure()    # Disable django settings
 import django.forms.fields
 
@@ -65,6 +66,24 @@ class Application(tornado.web.Application):
         log.info('listening on %s:%s' % (options.host, options.port))
         http_server.listen(options.port, address=options.host)
         tornado.ioloop.IOLoop.instance().start()
+
+
+# WSGI Application
+class WSGIApplication(tornado.wsgi.WSGIApplication):
+    def __init__(self, **kwargs):
+        settings = dict(
+            cookie_secret=options.cookie_secret,
+            xsrf_cookies=True,
+            debug=options.debug,
+            login_url='/',
+            ui_methods=[uimethods],
+        )
+        settings.update(kwargs)
+        if 'template_path' in options:
+            settings['template_path'] = options.template_path
+        if 'static_path' in options:
+            settings['static_path'] = options.static_path
+        tornado.wsgi.WSGIApplication.__init__(self, **settings)
 
 
 # Session Handler
