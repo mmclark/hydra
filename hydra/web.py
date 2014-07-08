@@ -168,7 +168,7 @@ class RequestHandler(tornado.web.RequestHandler):
 
     def validate_form(self, form_fields=None):
         self.tmpl['validated'] = True
-        form_fields = form_fields or getattr(self, form_fields)
+        form_fields = form_fields or getattr(self, 'form_fields')
         for name, field in form_fields.items():
             field['value'] = self.get_argument(name, None)
             try:
