@@ -67,6 +67,27 @@ class Application(tornado.web.Application):
         tornado.ioloop.IOLoop.instance().start()
 
 
+# WSGI Integration
+import tornado.wsgi
+
+
+class WSGIApplication(tornado.wsgi.WSGIApplication):
+    def __init__(self, **kwargs):
+        settings = dict(
+          cookie_secret=options.cookie_secret,
+          xsrf_cookies=True,
+          debug=options.debug,
+          login_url='/',
+          ui_methods=[uimethods],
+        )
+        settings.update(kwargs)
+        if 'template_path' in options:
+            settings['template_path'] = options.template_path
+        if 'static_path' in options:
+            settings['static_path'] = options.static_path
+        tornado.wsgi.WSGIApplication.__init__(self, **settings)
+
+        
 # Session Handler
 class Session(dict):
     def __init__(self, *args, **kwargs):
